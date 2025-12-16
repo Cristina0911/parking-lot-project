@@ -46,7 +46,7 @@ public class EditCar extends HttpServlet {
         Long userId = Long.parseLong(request.getParameter("owner_id"));
         Long carId = Long.parseLong(request.getParameter("car_id"));
 
-        carsBean.createCar(licensePlate, parkingSpot, userId);
+        carsBean.updateCar(carId,licensePlate,parkingSpot,userId);
 
         response.sendRedirect(request.getContextPath() + "/Cars");
     }
