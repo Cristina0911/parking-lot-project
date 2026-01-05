@@ -146,4 +146,19 @@ public class CarsBean {
         return new CarPhotoDto(photo.getId(), photo.getFilename(), photo.getFileType(),
                 photo.getFileContent());
     }
+
+    public long countCars() {
+        LOG.info("countCars");
+
+        try {
+            TypedQuery<Long> query =
+                    entityManager.createQuery(
+                            "SELECT COUNT(c) FROM Car c", Long.class
+                    );
+            return query.getSingleResult();
+        } catch (Exception ex) {
+            throw new EJBException(ex);
+        }
+    }
+
 }

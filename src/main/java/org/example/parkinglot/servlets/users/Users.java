@@ -1,4 +1,4 @@
-package org.example.parkinglot.servlets;
+package org.example.parkinglot.servlets.users;
 
 import jakarta.annotation.security.DeclareRoles;
 import jakarta.servlet.annotation.HttpConstraint;
@@ -17,9 +17,14 @@ import java.util.Collection;
 import java.util.List;
 
 
-@ServletSecurity(value = @HttpConstraint(rolesAllowed = {"READ_USERS"}),
-        httpMethodConstraints = {@HttpMethodConstraint(value = "POST", rolesAllowed = {"WRITE_USERS"})})
-@DeclareRoles({"READ_USERS", "WRITE_USERS"})
+@ServletSecurity(
+        value = @HttpConstraint(rolesAllowed = {"READ_USERS"}),
+        httpMethodConstraints = {
+                @HttpMethodConstraint(value = "POST", rolesAllowed = {"INVOICING"})
+        }
+)
+
+@DeclareRoles({"READ_USERS", "WRITE_USERS", "INVOICING"})
 @WebServlet(name = "Users", value = "/Users")
 public class Users extends HttpServlet {
 
@@ -34,12 +39,15 @@ public class Users extends HttpServlet {
         List<UserDto> users = usersBean.findAllUsers();
         request.setAttribute("users", users);
 
-        if(!invoiceBean.getUserIds().isEmpty()) {
-            Collection<String> usernames=usersBean.findUsernamesByUserIds(invoiceBean.getUserIds());
-            request.setAttribute("invoices", usernames);
+        if (request.isUserInRole("INVOICING")) {
+            if (!invoiceBean.getUserIds().isEmpty()) {
+                Collection<String> usernames =
+                        usersBean.findUsernamesByUserIds(invoiceBean.getUserIds());
+                request.setAttribute("invoices", usernames);
+            }
         }
 
-        request.getRequestDispatcher("/WEB-INF/pages/users.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/pages/users/users.jsp").forward(request, response);
     }
 
     @Override

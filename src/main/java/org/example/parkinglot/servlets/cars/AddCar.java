@@ -1,4 +1,4 @@
-package org.example.parkinglot.servlets;
+package org.example.parkinglot.servlets.cars;
 
 import jakarta.inject.Inject;
 import jakarta.servlet.ServletException;
@@ -8,17 +8,16 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.example.parkinglot.common.CarDto;
 import org.example.parkinglot.common.UserDto;
-import org.example.parkinglot.ejb.CarsBean;
 import org.example.parkinglot.ejb.UsersBean;
+import org.example.parkinglot.ejb.CarsBean;
 
 import java.io.IOException;
 import java.util.List;
 
 @ServletSecurity(value = @HttpConstraint(rolesAllowed = {"WRITE_CARS"}))
-@WebServlet(name="EditCar", value="/EditCar")
-public class EditCar extends HttpServlet {
+@WebServlet(name="AddCar" , value="/AddCar")
+public class AddCar extends HttpServlet {
 
     @Inject
     UsersBean usersBean;
@@ -27,16 +26,10 @@ public class EditCar extends HttpServlet {
     CarsBean carsBean;
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        List<UserDto> users=usersBean.findAllUsers();
-        request.setAttribute("users",users);
-
-        Long carId=Long.parseLong(request.getParameter("id"));
-        CarDto car=carsBean.findById(carId);
-        request.setAttribute("car",car);
-
-        request.getRequestDispatcher("/WEB-INF/pages/editCar.jsp").forward(request,response);
-
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        List<UserDto> users = usersBean.findAllUsers();
+        request.setAttribute("users", users);
+        request.getRequestDispatcher("/WEB-INF/pages/cars/addCar.jsp").forward(request, response);
     }
 
     @Override
@@ -44,10 +37,11 @@ public class EditCar extends HttpServlet {
         String licensePlate = request.getParameter("license_plate");
         String parkingSpot = request.getParameter("parking_spot");
         Long userId = Long.parseLong(request.getParameter("owner_id"));
-        Long carId = Long.parseLong(request.getParameter("car_id"));
 
-        carsBean.updateCar(carId,licensePlate,parkingSpot,userId);
+        carsBean.createCar(licensePlate, parkingSpot, userId);
 
         response.sendRedirect(request.getContextPath() + "/Cars");
     }
 }
+
+
